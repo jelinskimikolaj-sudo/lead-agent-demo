@@ -18,6 +18,7 @@ type Lead = {
   reason: string;
   reply: string;
   category: string;
+  needsAttention: boolean;
   time: string;
   done: boolean;
 };
@@ -33,13 +34,15 @@ export default function Dashboard() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   function loadLeads() {
-    fetch("/api/leads")
+    fetch("/api/leads", { cache: "no-store" })
       .then((res) => res.json())
       .then((serverLeads: Lead[]) => setLeads(serverLeads));
   }
 
   useEffect(() => {
     loadLeads();
+    const interval = setInterval(loadLeads, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   async function toggleDone(id: string, currentDone: boolean) {
@@ -101,9 +104,9 @@ export default function Dashboard() {
             return (
               <div
                 key={lead.id}
-                className={`bg-white border border-[#E4E0D4] rounded-xl overflow-hidden ${
-                  lead.done ? "opacity-50" : ""
-                }`}
+                className={`bg-white border rounded-xl overflow-hidden ${
+                  lead.needsAttention ? "border-[#C9A227]" : "border-[#E4E0D4]"
+                } ${lead.done ? "opacity-50" : ""}`}
               >
                 <div className="w-full text-left p-5 flex justify-between items-start">
                   <div className="flex gap-3 pr-4">
@@ -117,13 +120,18 @@ export default function Dashboard() {
                       onClick={() => setOpenIndex(isOpen ? null : i)}
                       className="text-left"
                     >
-                      <div className="flex items-center gap-2 mb-0.5">
+                      <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                         <p className={`font-medium text-[#1F2A22] ${lead.done ? "line-through" : ""}`}>
                           {lead.name}
                         </p>
                         <span className="text-xs text-[#8A8574]">
                           · {CATEGORY_LABELS[lead.category] ?? lead.category}
                         </span>
+                        {lead.needsAttention && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-[#FBF3DC] text-[#946C1F] font-medium">
+                            Wymaga uwagi
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm text-[#8A8574] mb-2">{lead.contact}</p>
                       <p className="text-sm text-[#5B5748] leading-relaxed">

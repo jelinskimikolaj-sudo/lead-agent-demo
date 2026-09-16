@@ -9,6 +9,7 @@ type Lead = {
   reason: string;
   reply: string;
   category: string;
+  needsAttention: boolean;
   time: string;
   done: boolean;
 };
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
     reason: body.reason,
     reply: body.reply,
     category: body.category,
+    needsAttention: !!body.needsAttention,
     time: new Date().toLocaleString("pl-PL", {
       hour: "2-digit",
       minute: "2-digit",

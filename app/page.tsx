@@ -35,7 +35,7 @@ export default function Home() {
       const data = await res.json();
       setResult(data);
 
-      await fetch("/api/leads", {
+            await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,6 +46,7 @@ export default function Home() {
           reason: data.reason,
           reply: data.reply,
           category: data.category,
+          needsAttention: data.needsAttention,
         }),
       });
     } catch {
